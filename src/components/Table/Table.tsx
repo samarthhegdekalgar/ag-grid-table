@@ -1,6 +1,6 @@
-import React, { FC, useState } from 'react';
+import React, { FC } from 'react';
 import { AgGridColumn, AgGridReact, } from 'ag-grid-react';
-import { RowSelectedEvent } from 'ag-grid-community';
+import {  SelectionChangedEvent } from 'ag-grid-community';
 
 export interface TableData {
     id: number
@@ -14,22 +14,26 @@ export interface TableData {
 
 interface TableProps {
     data: TableData[]
-    onSelectRow: (arg0: TableData[]) => unknown
+    onSelectRow?: (arg0: TableData[]) => unknown
+    showCheckBox?: boolean
 }
 
-const Table: FC<TableProps> = ({data, onSelectRow}: TableProps) => {
-    const [selectedRow, setSelectedRow] = useState<TableData[]>([])
+const Table: FC<TableProps> = ({data, onSelectRow = () => null, showCheckBox = false}: TableProps) => {
 
-    const handleGridChange =(event: RowSelectedEvent) => {
-        setSelectedRow([...selectedRow, event.data])
-        onSelectRow([...selectedRow, event.data])
+    const onSelectionChange = (event: SelectionChangedEvent) => {
+        onSelectRow(event.api.getSelectedRows())
     }
+
 
     return(
          <div className="ag-theme-alpine" style={{ height: '50vh', width: '100%' }}>
             <AgGridReact
-                rowData={data} rowSelection="multiple" onRowSelected={handleGridChange}>
-                <AgGridColumn field="id" checkboxSelection={ true }></AgGridColumn>
+                rowData={data} 
+                rowSelection="multiple" 
+                rowMultiSelectWithClick
+                onSelectionChanged={onSelectionChange}
+            >
+                <AgGridColumn field="id" checkboxSelection={showCheckBox}></AgGridColumn>
                 <AgGridColumn field="name"></AgGridColumn>
                 <AgGridColumn field="email"></AgGridColumn>
                 <AgGridColumn field="gender"></AgGridColumn>

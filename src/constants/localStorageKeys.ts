@@ -1,0 +1,1 @@
+export const SUBMITTED_DATA = '@user/SUBMITTED_DATA'
